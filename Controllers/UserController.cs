@@ -10,37 +10,56 @@ namespace CourtBooker.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        // GET: api/<UsuarioController>
+        private UserService _service = new();
+
         [HttpGet]
-        public List<User> Get()
+        public async Task<ActionResult<List<User>>> Get()
         {
-            List<User> result = UserService.ListarUsuarios();
-            return result;
+            return await Task.Run(ActionResult<List<User>> () =>
+            {
+                List<User> result = _service.ListarUsuarios();
+                return Ok(result);
+            });
         }
 
-        // GET api/<UsuarioController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{cpf}")]
+        public async Task<ActionResult<User>> Get(string cpf)
         {
-            return "value";
+            return await Task.Run(ActionResult<User> () =>
+            {
+                User? result = _service.GetUser(cpf);
+                return Ok(result);
+            });
         }
 
-        // POST api/<UsuarioController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<User>> AddUser([FromBody] User user)
         {
+            return await Task.Run(ActionResult<User> () =>
+            {
+                bool result = _service.AddUser(user);
+                return Ok(result);
+            });
         }
 
-        // PUT api/<UsuarioController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public async Task<IActionResult> EditUser([FromBody] User user)
         {
+            return await Task.Run(IActionResult () =>
+            {
+                bool result = _service.PutUser(user);
+                return Ok(result);
+            });
         }
 
-        // DELETE api/<UsuarioController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{cpf}")]
+        public async Task<IActionResult> DeleteUser(string cpf)
         {
+            return await Task.Run(IActionResult () =>
+            {
+                bool result = _service.DeleteUser(cpf);
+                return Ok(result);
+            });
         }
     }
 }
