@@ -21,7 +21,7 @@ namespace CourtBooker.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro ao acessar o banco de dados.", ex);
+                throw new Exception($"Falha ao precessar no banco de dados: {ex.Message}");
             }
         }
     }

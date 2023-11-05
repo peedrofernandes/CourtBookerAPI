@@ -2,7 +2,7 @@
 
 namespace CourtBooker.Enuns
 {
-    public enum UserType
+    public enum TipoUsuario
     {
         [Description("comum")]
         comum,
