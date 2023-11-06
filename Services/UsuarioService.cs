@@ -29,7 +29,7 @@ namespace CourtBooker.Services
         {
             return WithConnection(dbConn =>
             {
-                string sql = "INSERT INTO usuario (cpf_usuario, nome, email, hashsenha, tipo, data_final_bolsa) VALUES (@Cpf, @Nome, @Email, @Senha, CAST(@TipoUsuarioAux AS tipo_usuario), @DataFimBolsa)";
+                string sql = "INSERT INTO usuario (cpf_usuario, nome, email, hashsenha, tipo, data_final_bolsa) VALUES (@Cpf, @Nome, @Email, @Senha, CAST(@TipoUsuarioAux AS tipo_usuario), @DataFimBolsa) RETURNING *";
                 return dbConn.QuerySingle<Usuario>(sql, usuario);
             });
         }

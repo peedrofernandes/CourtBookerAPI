@@ -20,7 +20,7 @@ namespace CourtBooker.Services
         {
             return WithConnection(dbConn =>
             {
-                string sql = "INSERT INTO tipoesporte (nome) VALUES (@Nome)";
+                string sql = "INSERT INTO tipoesporte (nome) VALUES (@Nome) RETURNING *";
                 return dbConn.QuerySingle<Esporte>(sql, esporte);
             });
         }

@@ -31,12 +31,12 @@ namespace CourtBooker.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Quadra>> AdiucionarQuadra([FromBody] Quadra quadra)
+        public async Task<ActionResult<Quadra>> AdicionarQuadra([FromBody] Quadra quadra)
         {
             return await Task.Run(ActionResult<Quadra> () =>
             {
                 Quadra result = _service.AdicionarQuadra(quadra);
-                return CreatedAtAction(nameof(AdiucionarQuadra), result);
+                return CreatedAtAction(nameof(AdicionarQuadra), result);
             });
         }
 

@@ -27,7 +27,7 @@ namespace CourtBooker.Services
         {
             return WithConnection(dbConn =>
             {
-                string sql = "INSERT INTO quadra (nome, id_bloco) VALUES (@Nome, @IdBloco)";
+                string sql = "INSERT INTO quadra (nome, id_bloco) VALUES (@Nome, @IdBloco) RETURNING *";
                 return dbConn.QuerySingle<Quadra>(sql, quadra);
             });
         }
