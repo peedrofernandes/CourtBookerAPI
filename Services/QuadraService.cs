@@ -9,7 +9,7 @@ namespace CourtBooker.Services
         {
             return WithConnection(dbConn =>
             {
-                string sql = "SELECT nome, id, id_bloco as IdBloco FROM quadra";
+                string sql = QuerySelectAllAgendamento();
                 return dbConn.Query<Quadra>(sql).ToList();
             });
 
@@ -18,7 +18,8 @@ namespace CourtBooker.Services
         {
             return WithConnection(dbConn =>
             {
-                string sql = "SELECT nome, id, id_bloco as IdBloco FROM quadra WHERE id = @Id";
+                string sql = QuerySelectAllAgendamento();
+                sql += " WHERE id = @Id";
                 return dbConn.QueryFirstOrDefault<Quadra>(sql, new { Id = id });
             });
         }
@@ -32,6 +33,26 @@ namespace CourtBooker.Services
             });
         }
 
+        public bool AdicionarQuadraEsporte(int idQuadra, int idEsporte)
+        {
+            return WithConnection(dbConn =>
+            {
+                string sql = "INSERT INTO quadra_tipoesporte (id_quadra, id_tipo_esporte) VALUES (@IdQuadra, @IdEsporte)";
+                int rowsAffected = dbConn.Execute(sql, new {IdQuadra = idQuadra, IdEsporte = idEsporte});
+                return rowsAffected > 0;
+            });
+        }
+
+        public bool ExcluirQuadraEsporte(int idQuadra, int idEsporte)
+        {
+            return WithConnection(dbConn =>
+            {
+                string sql = "Delete FROM quadra_tipoesporte WHERE id_quadra = @IdQuadra AND id_tipo_esporte = @IdEsporte)";
+                int rowsAffected = dbConn.Execute(sql, new { IdQuadra = idQuadra, IdEsporte = idEsporte });
+                return rowsAffected > 0;
+            });
+        }
+
         public bool ExcluirQuadra(int id)
         {
             return WithConnection(dbConn =>
@@ -40,6 +61,13 @@ namespace CourtBooker.Services
                 int rowsAffected = dbConn.Execute(sql, new { Id = id });
                 return rowsAffected > 0;
             });
+        }
+
+        public static string QuerySelectAllAgendamento()
+        {
+            return "SELECT q.nome, q.id, q.id_bloco as idBloco, qte.idTiposEsporte FROM quadra q JOIN " +
+                "(SELECT id_quadra, array_agg(id_tipo_esporte) AS idTiposEsporte FROM quadra_tipoesporte " +
+                "GROUP BY id_quadra) qte ON qte.id_quadra = q.id";
         }
     }
 }

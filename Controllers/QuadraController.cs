@@ -40,6 +40,26 @@ namespace CourtBooker.Controllers
             });
         }
 
+        [HttpPost("AdicionarQuadraEsporte")]
+        public async Task<ActionResult<Quadra>> AdicionarQuadraEsporte(int idQuadra, int idEsporte)
+        {
+            return await Task.Run(ActionResult<Quadra> () =>
+            {
+                bool result = _service.AdicionarQuadraEsporte(idQuadra, idEsporte);
+                return Ok(result);
+            });
+        }
+
+        [HttpDelete("ExcluirQuadraEsporte")]
+        public async Task<ActionResult<Quadra>> ExcluirQuadraEsporte(int idQuadra, int idEsporte)
+        {
+            return await Task.Run(ActionResult<Quadra> () =>
+            {
+                bool result = _service.ExcluirQuadraEsporte(idQuadra, idEsporte);
+                return Ok(result);
+            });
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> ExcluirQuadra(int id)
         {
