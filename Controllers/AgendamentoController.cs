@@ -36,7 +36,7 @@ namespace CourtBooker.Controllers
         {
             return await Task.Run(ActionResult<Agendamento> () =>
             {
-                _service.AdicionarAgendamento(agendamento);
+                _service.ValidarAgendamento(agendamento);
                 return CreatedAtAction(nameof(AdicionarAgendamento), new {agendamento});
             });
         }

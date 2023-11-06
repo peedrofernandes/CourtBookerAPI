@@ -10,7 +10,8 @@ namespace CourtBooker.Model
         public TimeSpan HorarioInicial { get; set; }
         [Required(ErrorMessage = "O agendamento não possui tempo final")]
         public TimeSpan HorarioFinal { get; set; }
-        public DateTime Data { get; set; }
+        public DateTime DataInicio { get; set; }
+        public DateTime DataFim { get; set; }
         [StringLength(11, ErrorMessage = "Formato do Cpf inválido", MinimumLength = 11)]
         [Required(ErrorMessage = "O campo Cpf é obrigatório e não pode ser deixado em branco")]
         public string CpfUsuario { get; set; }
@@ -21,7 +22,28 @@ namespace CourtBooker.Model
         public string? EmailUsuario { get; set; }
         public bool Presenca { get; set; }
         public bool Evento { get; set; }
-        public List<DiasSemana> DiasSemana { get; set; } = new();
+        public bool Recorrente { get; set; }
+        public int[] DiasSemana { get; set; }
 
+        public Agendamento()
+        {
+
+        }
+
+        public Agendamento(TimeSpan horarioInicial, TimeSpan horarioFinal, DateTime dataInicio, DateTime dataFim, string cpfUsuario, int idQUadra, EnumStatusAgendamento statusAgendamento, string? emailUsuario, bool presenca, bool evento, bool recorrente, int[] diasSemana)
+        {
+            HorarioInicial = horarioInicial;
+            HorarioFinal = horarioFinal;
+            DataInicio = dataInicio;
+            DataFim = dataFim;
+            CpfUsuario = cpfUsuario;
+            IdQUadra = idQUadra;
+            StatusAgendamento = statusAgendamento;
+            EmailUsuario = emailUsuario;
+            Presenca = presenca;
+            Evento = evento;
+            Recorrente = recorrente;
+            DiasSemana = diasSemana;
+        }
     }
 }

@@ -10,12 +10,9 @@ namespace CourtBooker.Services
     {
         public Agendamento AdicionarAgendamento(Agendamento agendamento)
         {
-            ValidarAgendamento(agendamento);
             return WithConnection(dbConn =>
             {
-                string sql = "INSERT INTO agendamento (cpf_usuario, id_quadra, status, data, horario_inicial, horario_final, emailUsuario, presenca)" +
-                "VALUES (@CpfUsuario, @IdQuadra, CAST(@StatusAgendamentoAux AS status_agendamento), @Data, @HorarioInicial, @HorarioFinal, @EmailUsuario, @Presenca)" +
-                " RETURNING *";
+                string sql = GetQuery(agendamento);
                 return dbConn.QuerySingle<Agendamento>(sql, agendamento);
             });
         }
@@ -37,7 +34,7 @@ namespace CourtBooker.Services
             {
                 string sql = QuerySelectAllAgendamento();
                 sql += " join quadra q on id_quadra = q.id join bloco b on b.id = q.id_bloco where b.id = @IdBloco";
-                return dbConn.Query<Agendamento>(sql, new {IdBloco = idBloco}).ToList();
+                return dbConn.Query<Agendamento>(sql, new { IdBloco = idBloco }).ToList();
             });
 
         }
@@ -58,17 +55,13 @@ namespace CourtBooker.Services
             return result;
         }
 
-        public Agendamento AdicionarEvento(Agendamento agendamento)
+        public bool AdicionarEvento(Agendamento agendamento)
         {
-            
-
-
             return WithConnection(dbConn =>
             {
-                string sql = "INSERT INTO agendamento (cpf_usuario, id_quadra, status, data, horario_inicial, horario_final, emailUsuario, presenca)" +
-                "VALUES (@CpfUsuario, @IdQuadra, CAST(@StatusAgendamentoAux AS status_agendamento), @Data, @HorarioInicial, @HorarioFinal, @EmailUsuario, @Presenca)" +
-                " RETURNING *";
-                return dbConn.QuerySingle<Agendamento>(sql, agendamento);
+                string sql = GetQuery(agendamento);
+                int rowsAffected = dbConn.Execute(sql);
+                return rowsAffected > 0;
             });
         }
 
@@ -96,13 +89,93 @@ namespace CourtBooker.Services
         }
         public static string QuerySelectAllAgendamento()
         {
-            return "SELECT a.id, emailUsuario, cpf_usuario AS CpfUsuario, id_quadra AS IdQuadra, status as StatusAgendamento, data as Data, " +
+            return "SELECT a.id, emailUsuario, cpf_usuario AS CpfUsuario, id_quadra AS IdQuadra, status as StatusAgendamento, dataInicial as DataInicio, dataFinal as DataFim, " +
                 "horario_inicial AS HorarioInicial, horario_final as HorarioFinal, presenca FROM agendamento a";
         }
-
-        private void ValidarAgendamento(Agendamento agendamento)
+        public static List<Agendamento> GerarEventosSemanais(Agendamento agendamento)
         {
-            
+            var eventos = new List<Agendamento>();
+
+            for (var dt = agendamento.DataInicio; dt <= agendamento.DataFim; dt = dt.AddDays(1))
+            {
+                if (agendamento.DiasSemana.Contains((int)dt.DayOfWeek))
+                {
+                    agendamento.DataInicio = dt;
+                    eventos.Add(new Agendamento(
+                      agendamento.HorarioInicial,
+                      agendamento.HorarioFinal,
+                      dt,
+                      agendamento.DataFim,
+                      agendamento.CpfUsuario,
+                      agendamento.IdQUadra,
+                      agendamento.StatusAgendamento,
+                      agendamento.EmailUsuario,
+                      agendamento.Presenca,
+                      agendamento.Evento,
+                      agendamento.Recorrente,
+                      agendamento.DiasSemana
+                    ));
+                }
+            }
+
+            return eventos;
+        }
+        private static string GetQuery(Agendamento agendamento)
+        {
+            string sql;
+            if (agendamento.Evento && agendamento.Recorrente)
+            {
+                List<Agendamento> lista = GerarEventosSemanais(agendamento);
+                sql = CriarComandosInsert(lista);
+            }
+            else
+                sql = CriarComandosInsert(new List<Agendamento> { agendamento });
+
+            return sql;
+        }
+
+        public static string CriarComandosInsert(List<Agendamento> eventos)
+        {
+            var comandos = new List<string>();
+
+            foreach (var evento in eventos)
+            {
+                string diasSemanaArray = "{" + string.Join(",", evento.DiasSemana.Select(d => ((int)d).ToString())) + "}";
+
+
+                string comando = "INSERT INTO agendamento (cpf_usuario, id_quadra, status, dataInicial, dataFinal, horario_inicial, horario_final, emailUsuario, presenca, evento, recorrente, diasSemana) " +
+                                 "VALUES (" +
+                                 $"'{evento.CpfUsuario}', " +
+                                 $"{evento.IdQUadra}, " +
+                                 $"CAST('{evento.StatusAgendamentoAux}' AS status_agendamento), " +
+                                 $"'{evento.DataInicio.ToString("yyyy-MM-dd")}', " +
+                                 $"'{evento.DataFim.ToString("yyyy-MM-dd")}', " +
+                                 $"'{evento.HorarioInicial}', " +
+                                 $"'{evento.HorarioFinal}', " +
+                                 $"'{evento.EmailUsuario}', " +
+                                 $"{(evento.Presenca ? "TRUE" : "FALSE")}, " +
+                                 $"{(evento.Evento ? "TRUE" : "FALSE")}, " +
+                                 $"{(evento.Recorrente ? "TRUE" : "FALSE")}, " +
+                                 $"'{diasSemanaArray}'" +
+                                 ")";
+                if (eventos.Count == 1)
+                    comando += " RETURNING *";
+                else
+                    comando += ";";
+
+                comandos.Add(comando);
+            }
+
+            return string.Join(" ", comandos);
+        }
+
+        public dynamic ValidarAgendamento(Agendamento agendamento)
+        {
+
+            if (agendamento.Evento && agendamento.Recorrente)
+                return AdicionarEvento(agendamento);
+            else
+                return AdicionarAgendamento(agendamento);
 
         }
     }
