@@ -8,6 +8,7 @@ namespace CourtBooker.Services
 {
     public class AgendamentoService : BaseRepository
     {
+        private QuadraService _quadraService = new QuadraService();
         public Agendamento AdicionarAgendamento(Agendamento agendamento)
         {
             return WithConnection(dbConn =>
@@ -19,13 +20,11 @@ namespace CourtBooker.Services
 
         public List<Agendamento> ListarAgendamentos()
         {
-
             return WithConnection(dbConn =>
             {
                 string sql = QuerySelectAllAgendamento();
                 return dbConn.Query<Agendamento>(sql).ToList();
             });
-
         }
 
         public List<Agendamento> ListarAgendamentosBloco(int idBloco)
@@ -171,12 +170,42 @@ namespace CourtBooker.Services
 
         public dynamic ValidarAgendamento(Agendamento agendamento)
         {
+            Quadra? quadra = _quadraService.BuscarQuadra(agendamento.IdQUadra);
 
+            if (quadra == null)
+                throw new BadHttpRequestException("Quadra indisponível");
+
+            CustomHelper.IsValidEmail(agendamento.EmailUsuario);
+            
             if (agendamento.Evento && agendamento.Recorrente)
                 return AdicionarEvento(agendamento);
             else
                 return AdicionarAgendamento(agendamento);
 
+        }
+
+        public void GetEmailMessage(Agendamento agendamento, out string message, out string receiver, out string subject, bool cancelar)
+        {
+            Quadra quadra = _quadraService.BuscarQuadra(agendamento.IdQUadra);
+
+            receiver = agendamento.EmailUsuario;
+            subject = cancelar ? "Cancelamento Agendamento" : "Confirmação Agendamento";
+            message = cancelar ? "Agendamento Cancelado\n\n" : "Agendamento realizado com sucesso\n\n";
+            message += $"Data Agendamento: {agendamento.DataInicio.ToString("dd/MM/yyyy")}\n";
+            message += $"Horário: {agendamento.HorarioInicial} - {agendamento.HorarioFinal}\n";
+            message += $"Quadra: {quadra.Nome}";
+        }
+
+        public void GetCancelationEmailMessage(Agendamento agendamento, out string message, out string receiver, out string subject)
+        {
+            Quadra quadra = new QuadraService().BuscarQuadra(agendamento.IdQUadra);
+
+            receiver = agendamento.EmailUsuario;
+            subject = "Cancelamento Agendamento";
+            message = "Agendamento Cancelado!\n\n";
+            message += $"Data Agendamento: {agendamento.DataInicio:yyyy-mm-dd}\n";
+            message += $"Horário: {agendamento.HorarioInicial} - {agendamento.HorarioFinal}\n";
+            message += $"Quadra: {quadra.Nome}";
         }
     }
 }

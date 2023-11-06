@@ -14,6 +14,14 @@ namespace CourtBooker.Services
             });
 
         }
+        public Quadra? BuscarQuadra(int id)
+        {
+            return WithConnection(dbConn =>
+            {
+                string sql = "SELECT nome, id, id_bloco as IdBloco FROM quadra WHERE id = @Id";
+                return dbConn.QueryFirstOrDefault<Quadra>(sql, new { Id = id });
+            });
+        }
 
         public Quadra AdicionarQuadra(Quadra quadra)
         {

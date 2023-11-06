@@ -10,6 +10,12 @@ namespace CourtBooker.Controllers
     public class AgendamentoController : ControllerBase
     {
         private AgendamentoService _service = new();
+        private readonly IEmailSender _emailSender;
+
+        public AgendamentoController(IEmailSender emailSender)
+        {
+            _emailSender = emailSender;
+        }
 
         [HttpGet]
         public async Task<ActionResult<List<Agendamento>>> ListarAgendamentos()
@@ -37,6 +43,8 @@ namespace CourtBooker.Controllers
             return await Task.Run(ActionResult<Agendamento> () =>
             {
                 _service.ValidarAgendamento(agendamento);
+                _service.GetEmailMessage(agendamento, out string message, out string receiver, out string subject, false);
+                _emailSender.SendEmailAsync(receiver, subject, message);
                 return CreatedAtAction(nameof(AdicionarAgendamento), new {agendamento});
             });
         }
@@ -47,7 +55,10 @@ namespace CourtBooker.Controllers
         {
             return await Task.Run(IActionResult () =>
             {
-                bool result = _service.ExcluirAgendamento(id);   
+                Agendamento agendamento = _service.BuscarAgendamento(id);
+                bool result = _service.ExcluirAgendamento(id);
+                _service.GetEmailMessage(agendamento, out string message, out string receiver, out string subject, true);
+                _emailSender.SendEmailAsync(receiver, subject, message);
                 return Ok(result);
             });
         }

@@ -20,6 +20,16 @@ namespace CourtBooker.Controllers
             });
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Quadra>> BuscarQuadra(int id)
+        {
+            return await Task.Run(ActionResult<Quadra> () =>
+            {
+                Quadra? result = _service.BuscarQuadra(id);
+                return Ok(result);
+            });
+        }
+
         [HttpPost]
         public async Task<ActionResult<Quadra>> AdiucionarQuadra([FromBody] Quadra quadra)
         {
