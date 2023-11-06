@@ -31,3 +31,6 @@ C:\Users\andre\source\repos\CourtBooker\obj\Debug\net7.0\refint\CourtBooker.dll
 C:\Users\andre\source\repos\CourtBooker\obj\Debug\net7.0\CourtBooker.pdb
 C:\Users\andre\source\repos\CourtBooker\obj\Debug\net7.0\CourtBooker.genruntimeconfig.cache
 C:\Users\andre\source\repos\CourtBooker\obj\Debug\net7.0\ref\CourtBooker.dll
+C:\Users\andre\source\repos\CourtBooker\bin\Debug\net7.0\Dapper.dll
+C:\Users\andre\source\repos\CourtBooker\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\andre\source\repos\CourtBooker\bin\Debug\net7.0\Npgsql.dll

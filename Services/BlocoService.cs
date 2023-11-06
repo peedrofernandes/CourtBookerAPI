@@ -16,13 +16,12 @@ namespace CourtBooker.Services
 
         }
 
-        public bool AdicionarBloco(Bloco bloco)
+        public Bloco AdicionarBloco(Bloco bloco)
         {
             return WithConnection(dbConn =>
             {
                 string sql = "INSERT INTO bloco (nome) VALUES (@Nome)";
-                int rowsAffected = dbConn.Execute(sql, bloco);
-                return rowsAffected > 0;
+                return dbConn.QuerySingle<Bloco>(sql, bloco);
             });
         }
 

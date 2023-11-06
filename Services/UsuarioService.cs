@@ -25,13 +25,12 @@ namespace CourtBooker.Services
             });
         }
 
-        public bool AdicionarUsuario(Usuario user)
+        public Usuario AdicionarUsuario(Usuario usuario)
         {
             return WithConnection(dbConn =>
             {
                 string sql = "INSERT INTO usuario (cpf_usuario, nome, email, hashsenha, tipo, data_final_bolsa) VALUES (@Cpf, @Nome, @Email, @Senha, CAST(@TipoUsuarioAux AS tipo_usuario), @DataFimBolsa)";
-                int rowsAffected = dbConn.Execute(sql, user);
-                return rowsAffected > 0;
+                return dbConn.QuerySingle<Usuario>(sql, usuario);
             });
         }
 

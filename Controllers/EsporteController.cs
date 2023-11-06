@@ -11,7 +11,7 @@ namespace CourtBooker.Controllers
         private EsporteService _service = new();
 
         [HttpGet]
-        public async Task<ActionResult<List<Esporte>>> Esporte()
+        public async Task<ActionResult<List<Esporte>>> ListarEsportes()
         {
             return await Task.Run(ActionResult<List<Esporte>> () =>
             {
@@ -20,17 +20,17 @@ namespace CourtBooker.Controllers
             });
         }
         [HttpPost]
-        public async Task<ActionResult<Esporte>> Esporte([FromBody] Esporte esporte)
+        public async Task<ActionResult<Esporte>> AdicionarEsporte([FromBody] Esporte esporte)
         {
             return await Task.Run(ActionResult<Esporte> () =>
             {
-                bool result = _service.AdicionarEsporte(esporte);
-                return Ok(result);
+                Esporte result = _service.AdicionarEsporte(esporte);
+                return CreatedAtAction(nameof(AdicionarEsporte), esporte);
             });
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Esporte(int id)
+        public async Task<IActionResult> ExcluirEsporte(int id)
         {
             return await Task.Run(IActionResult () =>
             {

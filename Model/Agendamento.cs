@@ -20,5 +20,8 @@ namespace CourtBooker.Model
         public string StatusAgendamentoAux => StatusAgendamento.ToString().ToLower();
         public string? EmailUsuario { get; set; }
         public bool Presenca { get; set; }
+        public bool Evento { get; set; }
+        public List<DiasSemana> DiasSemana { get; set; } = new();
+
     }
 }

@@ -16,13 +16,12 @@ namespace CourtBooker.Services
 
         }
 
-        public bool AdicionarEsporte(Esporte esporte)
+        public Esporte AdicionarEsporte(Esporte esporte)
         {
             return WithConnection(dbConn =>
             {
                 string sql = "INSERT INTO tipoesporte (nome) VALUES (@Nome)";
-                int rowsAffected = dbConn.Execute(sql, esporte);
-                return rowsAffected > 0;
+                return dbConn.QuerySingle<Esporte>(sql, esporte);
             });
         }
 

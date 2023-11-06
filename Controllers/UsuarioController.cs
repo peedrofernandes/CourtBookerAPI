@@ -37,8 +37,8 @@ namespace CourtBooker.Controllers
         {
             return await Task.Run(ActionResult<Usuario> () =>
             {
-                bool result = _service.AdicionarUsuario(user);
-                return Ok(result);
+                Usuario result = _service.AdicionarUsuario(user);
+                return CreatedAtAction(nameof(AdicionarUsuario), result);
             });
         }
 

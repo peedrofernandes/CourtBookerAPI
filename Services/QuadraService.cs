@@ -15,13 +15,12 @@ namespace CourtBooker.Services
 
         }
 
-        public bool AdicionarQuadra(Quadra quadra)
+        public Quadra AdicionarQuadra(Quadra quadra)
         {
             return WithConnection(dbConn =>
             {
                 string sql = "INSERT INTO quadra (nome, id_bloco) VALUES (@Nome, @IdBloco)";
-                int rowsAffected = dbConn.Execute(sql, quadra);
-                return rowsAffected > 0;
+                return dbConn.QuerySingle<Quadra>(sql, quadra);
             });
         }
 

@@ -11,7 +11,7 @@ namespace CourtBooker.Controllers
         private QuadraService _service = new();
 
         [HttpGet]
-        public async Task<ActionResult<List<Quadra>>> Quadra()
+        public async Task<ActionResult<List<Quadra>>> ListarQuadras()
         {
             return await Task.Run(ActionResult<List<Quadra>> () =>
             {
@@ -21,17 +21,17 @@ namespace CourtBooker.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Quadra>> Quadra([FromBody] Quadra quadra)
+        public async Task<ActionResult<Quadra>> AdiucionarQuadra([FromBody] Quadra quadra)
         {
             return await Task.Run(ActionResult<Quadra> () =>
             {
-                bool result = _service.AdicionarQuadra(quadra);
-                return Ok(result);
+                Quadra result = _service.AdicionarQuadra(quadra);
+                return CreatedAtAction(nameof(AdiucionarQuadra), result);
             });
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Quadra(int id)
+        public async Task<IActionResult> ExcluirQuadra(int id)
         {
             return await Task.Run(IActionResult () =>
             {

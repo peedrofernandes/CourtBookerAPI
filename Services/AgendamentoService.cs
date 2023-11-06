@@ -1,4 +1,6 @@
-﻿using CourtBooker.Model;
+﻿using CourtBooker.Enuns;
+using CourtBooker.Helpers;
+using CourtBooker.Model;
 using Dapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -47,6 +49,26 @@ namespace CourtBooker.Services
                 string sql = "Delete from agendamento WHERE id = @Id";
                 int rowsAffected = dbConn.Execute(sql, new { Id = id });
                 return rowsAffected > 0;
+            });
+        }
+
+        public List<EnumValueDescription> ListarDiasSemana()
+        {
+            List<EnumValueDescription> result = EnumHelper.GetEnumValueDescriptionList<DiasSemana>();
+            return result;
+        }
+
+        public Agendamento AdicionarEvento(Agendamento agendamento)
+        {
+            
+
+
+            return WithConnection(dbConn =>
+            {
+                string sql = "INSERT INTO agendamento (cpf_usuario, id_quadra, status, data, horario_inicial, horario_final, emailUsuario, presenca)" +
+                "VALUES (@CpfUsuario, @IdQuadra, CAST(@StatusAgendamentoAux AS status_agendamento), @Data, @HorarioInicial, @HorarioFinal, @EmailUsuario, @Presenca)" +
+                " RETURNING *";
+                return dbConn.QuerySingle<Agendamento>(sql, agendamento);
             });
         }
 

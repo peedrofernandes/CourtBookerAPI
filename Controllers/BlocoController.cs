@@ -11,7 +11,7 @@ namespace CourtBooker.Controllers
         private BlocoService _service = new();
 
         [HttpGet]
-        public async Task<ActionResult<List<Bloco>>> Bloco()
+        public async Task<ActionResult<List<Bloco>>> ListarBlocos()
         {
             return await Task.Run(ActionResult<List<Bloco>> () =>
             {
@@ -20,17 +20,17 @@ namespace CourtBooker.Controllers
             });
         }
         [HttpPost]
-        public async Task<ActionResult<Bloco>> Bloco([FromBody] Bloco bloco)
+        public async Task<ActionResult<Bloco>> AdicionarBloco([FromBody] Bloco bloco)
         {
             return await Task.Run(ActionResult<Bloco> () =>
             {
-                bool result = _service.AdicionarBloco(bloco);
-                return Ok(result);
+                Bloco result = _service.AdicionarBloco(bloco);
+                return CreatedAtAction(nameof(AdicionarBloco), result);
             });
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Bloco(int id)
+        public async Task<IActionResult> ExcluirBloco(int id)
         {
             return await Task.Run(IActionResult () =>
             {

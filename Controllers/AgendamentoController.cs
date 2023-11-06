@@ -1,4 +1,5 @@
-﻿using CourtBooker.Model;
+﻿using CourtBooker.Enuns;
+using CourtBooker.Model;
 using CourtBooker.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,6 +48,17 @@ namespace CourtBooker.Controllers
             return await Task.Run(IActionResult () =>
             {
                 bool result = _service.ExcluirAgendamento(id);   
+                return Ok(result);
+            });
+        }
+
+
+        [HttpGet("ListarDiasSemana")]
+        public async Task<ActionResult<List<EnumValueDescription>>> ListarDiasSemana()
+        {
+            return await Task.Run(ActionResult<List<EnumValueDescription>> () =>
+            {
+                var result = _service.ListarDiasSemana();
                 return Ok(result);
             });
         }
