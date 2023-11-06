@@ -18,5 +18,7 @@ namespace CourtBooker.Model
         public int IdQUadra { get; set; }
         public EnumStatusAgendamento StatusAgendamento { get; set; }
         public string StatusAgendamentoAux => StatusAgendamento.ToString().ToLower();
+        public string? EmailUsuario { get; set; }
+        public bool Presenca { get; set; }
     }
 }

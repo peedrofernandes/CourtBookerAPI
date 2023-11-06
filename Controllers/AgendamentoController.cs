@@ -11,7 +11,7 @@ namespace CourtBooker.Controllers
         private AgendamentoService _service = new();
 
         [HttpGet]
-        public async Task<ActionResult<List<Agendamento>>> Agendamentos()
+        public async Task<ActionResult<List<Agendamento>>> ListarAgendamentos()
         {
             return await Task.Run(ActionResult<List<Agendamento>> () =>
             {
@@ -20,13 +20,34 @@ namespace CourtBooker.Controllers
             });
         }
 
+        [HttpGet("AgendamentosDoBloco/{idBloco}")]
+        public async Task<ActionResult<List<Agendamento>>> ListarAgendamentosBloco(int idBloco)
+        {
+            return await Task.Run(ActionResult<List<Agendamento>> () =>
+            {
+                List<Agendamento> result = _service.ListarAgendamentosBloco(idBloco);
+                return Ok(result);
+            });
+        }
+
         [HttpPost]
-        public async Task<ActionResult<Agendamento>> Agendamento([FromBody] Agendamento agendamento)
+        public async Task<ActionResult<Agendamento>> AdicionarAgendamento([FromBody] Agendamento agendamento)
         {
             return await Task.Run(ActionResult<Agendamento> () =>
             {
                 _service.AdicionarAgendamento(agendamento);
-                return CreatedAtAction(nameof(Agendamento), new {});
+                return CreatedAtAction(nameof(AdicionarAgendamento), new {agendamento});
+            });
+        }
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> ExcluirAgendamento(int id)
+        {
+            return await Task.Run(IActionResult () =>
+            {
+                bool result = _service.ExcluirAgendamento(id);   
+                return Ok(result);
             });
         }
     }
