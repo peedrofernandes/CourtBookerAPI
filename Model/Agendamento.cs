@@ -1,5 +1,6 @@
 ﻿using CourtBooker.Enuns;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CourtBooker.Model
 {
@@ -11,7 +12,7 @@ namespace CourtBooker.Model
         [Required(ErrorMessage = "O agendamento não possui tempo final")]
         public TimeSpan HorarioFinal { get; set; }
         public DateTime DataInicio { get; set; }
-        public DateTime DataFim { get; set; }
+        public DateTime? DataFim { get; set; }
         [StringLength(11, ErrorMessage = "Formato do Cpf inválido", MinimumLength = 11)]
         [Required(ErrorMessage = "O campo Cpf é obrigatório e não pode ser deixado em branco")]
         public string CpfUsuario { get; set; }
@@ -24,7 +25,8 @@ namespace CourtBooker.Model
         public bool Presenca { get; set; }
         public bool Evento { get; set; }
         public bool Recorrente { get; set; }
-        public int[] DiasSemana { get; set; }
+        [AllowNull]
+        public int[]? DiasSemana { get; set; }
 
         public Agendamento()
         {

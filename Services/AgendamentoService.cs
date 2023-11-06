@@ -104,7 +104,7 @@ namespace CourtBooker.Services
                       agendamento.HorarioInicial,
                       agendamento.HorarioFinal,
                       dt,
-                      agendamento.DataFim,
+                      agendamento.DataFim.GetValueOrDefault(),
                       agendamento.CpfUsuario,
                       agendamento.IdQUadra,
                       agendamento.StatusAgendamento,
@@ -119,6 +119,46 @@ namespace CourtBooker.Services
 
             return eventos;
         }
+
+        public dynamic ValidarAgendamento(Agendamento agendamento)
+        {
+            Quadra? quadra = _quadraService.BuscarQuadra(agendamento.IdQUadra);
+
+            if (quadra == null)
+                throw new BadHttpRequestException("Quadra indisponível");
+
+            if (agendamento.DiasSemana == null)
+                agendamento.DiasSemana = Array.Empty<int>();
+
+            CustomHelper.IsValidEmail(agendamento.EmailUsuario);
+            
+            if (agendamento.Evento && agendamento.Recorrente)
+            {
+                if (agendamento.DataFim == null)
+                    throw new BadHttpRequestException("Um evento deve conter uma data final");
+
+                if(!agendamento.DiasSemana.Any())
+                    throw new BadHttpRequestException("Eventos recorrentes devem ter Dias da Semana definidos!");
+
+                return AdicionarEvento(agendamento);
+            }
+            else
+                return AdicionarAgendamento(agendamento);
+
+        }
+
+        public void GetEmailMessage(Agendamento agendamento, out string message, out string receiver, out string subject, bool cancelar)
+        {
+            Quadra quadra = _quadraService.BuscarQuadra(agendamento.IdQUadra);
+
+            receiver = agendamento.EmailUsuario;
+            subject = cancelar ? "Cancelamento Agendamento" : "Confirmação Agendamento";
+            message = cancelar ? "Agendamento Cancelado\n\n" : "Agendamento realizado com sucesso\n\n";
+            message += $"Data Agendamento: {agendamento.DataInicio.ToString("dd/MM/yyyy")}\n";
+            message += $"Horário: {agendamento.HorarioInicial} - {agendamento.HorarioFinal}\n";
+            message += $"Quadra: {quadra.Nome}";
+        }
+
         private static string GetQuery(Agendamento agendamento)
         {
             string sql;
@@ -148,7 +188,7 @@ namespace CourtBooker.Services
                                  $"{evento.IdQUadra}, " +
                                  $"CAST('{evento.StatusAgendamentoAux}' AS status_agendamento), " +
                                  $"'{evento.DataInicio.ToString("yyyy-MM-dd")}', " +
-                                 $"'{evento.DataFim.ToString("yyyy-MM-dd")}', " +
+                                 $"'{evento.DataFim.GetValueOrDefault().ToString("yyyy-MM-dd")}', " +
                                  $"'{evento.HorarioInicial}', " +
                                  $"'{evento.HorarioFinal}', " +
                                  $"'{evento.EmailUsuario}', " +
@@ -157,6 +197,7 @@ namespace CourtBooker.Services
                                  $"{(evento.Recorrente ? "TRUE" : "FALSE")}, " +
                                  $"'{diasSemanaArray}'" +
                                  ")";
+
                 if (eventos.Count == 1)
                     comando += " RETURNING *";
                 else
@@ -166,46 +207,6 @@ namespace CourtBooker.Services
             }
 
             return string.Join(" ", comandos);
-        }
-
-        public dynamic ValidarAgendamento(Agendamento agendamento)
-        {
-            Quadra? quadra = _quadraService.BuscarQuadra(agendamento.IdQUadra);
-
-            if (quadra == null)
-                throw new BadHttpRequestException("Quadra indisponível");
-
-            CustomHelper.IsValidEmail(agendamento.EmailUsuario);
-            
-            if (agendamento.Evento && agendamento.Recorrente)
-                return AdicionarEvento(agendamento);
-            else
-                return AdicionarAgendamento(agendamento);
-
-        }
-
-        public void GetEmailMessage(Agendamento agendamento, out string message, out string receiver, out string subject, bool cancelar)
-        {
-            Quadra quadra = _quadraService.BuscarQuadra(agendamento.IdQUadra);
-
-            receiver = agendamento.EmailUsuario;
-            subject = cancelar ? "Cancelamento Agendamento" : "Confirmação Agendamento";
-            message = cancelar ? "Agendamento Cancelado\n\n" : "Agendamento realizado com sucesso\n\n";
-            message += $"Data Agendamento: {agendamento.DataInicio.ToString("dd/MM/yyyy")}\n";
-            message += $"Horário: {agendamento.HorarioInicial} - {agendamento.HorarioFinal}\n";
-            message += $"Quadra: {quadra.Nome}";
-        }
-
-        public void GetCancelationEmailMessage(Agendamento agendamento, out string message, out string receiver, out string subject)
-        {
-            Quadra quadra = new QuadraService().BuscarQuadra(agendamento.IdQUadra);
-
-            receiver = agendamento.EmailUsuario;
-            subject = "Cancelamento Agendamento";
-            message = "Agendamento Cancelado!\n\n";
-            message += $"Data Agendamento: {agendamento.DataInicio:yyyy-mm-dd}\n";
-            message += $"Horário: {agendamento.HorarioInicial} - {agendamento.HorarioFinal}\n";
-            message += $"Quadra: {quadra.Nome}";
         }
     }
 }
