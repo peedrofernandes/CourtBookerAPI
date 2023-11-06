@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Newtonsoft.Json;
 
-namespace octopus_service.Middleware
+namespace CourtBooker.Middleware
 {
     public static class ErrorHandlerExtensions
     {
