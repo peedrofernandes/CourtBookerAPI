@@ -89,7 +89,7 @@ namespace CourtBooker.Services
         public static string QuerySelectAllAgendamento()
         {
             return "SELECT a.id, emailUsuario, cpf_usuario AS CpfUsuario, id_quadra AS IdQuadra, status as StatusAgendamento, dataInicial as DataInicio, dataFinal as DataFim, " +
-                "horario_inicial AS HorarioInicial, horario_final as HorarioFinal, presenca FROM agendamento a";
+                "horario_inicial AS HorarioInicial, horario_final as HorarioFinal, presenca, recorrente, evento, diasSemana FROM agendamento a";
         }
         public static List<Agendamento> GerarEventosSemanais(Agendamento agendamento)
         {
@@ -162,6 +162,10 @@ namespace CourtBooker.Services
         private static string GetQuery(Agendamento agendamento)
         {
             string sql;
+
+            if (!agendamento.Evento && agendamento.Recorrente)
+                throw new BadHttpRequestException("Agendamentos não podem ser recorrentes. Torne-o um Evento");
+
             if (agendamento.Evento && agendamento.Recorrente)
             {
                 List<Agendamento> lista = GerarEventosSemanais(agendamento);
