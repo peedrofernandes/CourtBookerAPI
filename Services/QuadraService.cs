@@ -65,7 +65,7 @@ namespace CourtBooker.Services
 
         public static string QuerySelectAllAgendamento()
         {
-            return "SELECT q.nome, q.id, q.id_bloco as idBloco, qte.idTiposEsporte FROM quadra q JOIN " +
+            return "SELECT q.nome, q.id, q.id_bloco as idBloco, qte.idTiposEsporte FROM quadra q LEFT JOIN " +
                 "(SELECT id_quadra, array_agg(id_tipo_esporte) AS idTiposEsporte FROM quadra_tipoesporte " +
                 "GROUP BY id_quadra) qte ON qte.id_quadra = q.id";
         }
