@@ -86,6 +86,16 @@ namespace CourtBooker.Services
                 return dbConn.QueryFirstOrDefault<Agendamento>(sql, new { Id = id });
             });
         }
+
+        public Agendamento? VerificaAgendamentoUsuarioExistente (DateTime dataInicial, string cpf)
+        {
+            return WithConnection(dbConn =>
+            {
+                string sql = "SELECT 1 FROM agendamento";
+                sql += " WHERE cpf_usuario = @Cpf AND dataInicial = @DataInicial";
+                return dbConn.QueryFirstOrDefault<Agendamento>(sql, new { Cpf = cpf, DataInicial = dataInicial });
+            });
+        }
         public static string QuerySelectAllAgendamento()
         {
             return "SELECT a.id, emailUsuario, cpf_usuario AS CpfUsuario, id_quadra AS IdQuadra, status as StatusAgendamento, dataInicial as DataInicio, dataFinal as DataFim, " +
@@ -131,6 +141,11 @@ namespace CourtBooker.Services
                 agendamento.DiasSemana = Array.Empty<int>();
 
             CustomHelper.IsValidEmail(agendamento.EmailUsuario);
+
+            Agendamento agendamentoAux = VerificaAgendamentoUsuarioExistente(agendamento.DataInicio, agendamento.CpfUsuario);
+
+            if (agendamentoAux != null)
+                throw new BadHttpRequestException($"Não é possível agendar dois agendamento na mesma data com o mesmo CPF");
             
             if (agendamento.Evento && agendamento.Recorrente)
             {
